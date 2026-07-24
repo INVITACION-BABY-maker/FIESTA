@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Baby Shower - Mateo Gabriel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body, html { 
+            width: 100%; height: 100%; overflow: hidden; 
+            font-family: 'Fredoka', sans-serif; 
+            background: linear-gradient(-45deg, #e0f2fe, #bae6fd, #7dd3fc, #e0f2fe);
+            background-size: 400% 400%; animation: respirarFondo 15s ease infinite;
+        }
+        @keyframes respirarFondo { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* --- PANTALLA INICIAL --- */
+        #pantalla-inicio {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 132, 199, 0.95); z-index: 99999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: white; cursor: pointer; transition: opacity 1s ease;
+        }
+        .sobre-icono { font-size: 5em; animation: latidoIntenso 1.5s infinite; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); margin-bottom: 15px; margin-top: 10px; }
+        @keyframes latidoIntenso { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+        #pantalla-inicio h1 { font-size: 1.5em; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; text-align: center; line-height: 1.4; }
+
+        /* --- LLUVIA TEMÁTICA --- */
+        .elemento-lluvia {
+            position: absolute; top: -10%; z-index: 5;
+            animation: caerYRotar linear forwards;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
+            opacity: 0.85;
+        }
+        @keyframes caerYRotar {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- CONTENEDOR PELÍCULA --- */
+        #contenedor-pelicula { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; padding: 20px; z-index: 50; }
+
+        /* --- ESCENAS --- */
+        .escena {
+            position: absolute; width: 95%; max-width: 420px;
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px);
+            border-radius: 30px; border: 3px solid rgba(255,255,255,0.95);
+            box-shadow: 0 25px 50px rgba(2, 132, 199, 0.25), inset 0 0 20px rgba(255,255,255,0.8);
+            padding: 40px 25px; text-align: center;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            
+            opacity: 0; transform: scale(1.15) translateY(20px); pointer-events: none;
+            transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1), transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .escena.visible { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; z-index: 100; }
+        .escena.pasada { opacity: 0; transform: scale(0.9) translateY(-20px); pointer-events: none; z-index: 10; }
+
+        /* --- TEXTOS CLAROS Y PARA TODO PÚBLICO --- */
+        .texto-tierno { color: #0284c7; font-size: 1.45em; font-weight: 700; line-height: 1.35; margin: 10px 0; }
+        .texto-pequeno { color: #0369a1; font-size: 1.2em; font-weight: 600; line-height: 1.3; margin-top: 5px; }
+        .texto-destaque { background: #0369a1; color: white; padding: 8px 20px; border-radius: 30px; font-size: 1.2em; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin: 15px 0; display: inline-block; box-shadow: 0 5px 15px rgba(3, 105, 161, 0.3); }
+        
+        .nombres-padres { font-family: 'Pacifico', cursive; color: #0284c7; font-size: 3.5em; line-height: 1.2; text-shadow: 2px 2px 0px white; margin: 15px 0; }
+        .nombre-bebe { font-family: 'Pacifico', cursive; color: #0369a1; font-size: 4.5em; line-height: 1; text-shadow: 3px 3px 0px white, 0 10px 15px rgba(2,132,199,0.3); margin: 15px 0; animation: flotarTexto 3s infinite alternate; }
+        @keyframes flotarTexto { from { transform: translateY(0); } to { transform: translateY(-8px); } }
+        
+        /* --- IMÁGENES ANIMADAS (Jefe 1 y 4) --- */
+        .img-animada { width: 220px; border-radius: 20px; filter: drop-shadow(0 15px 20px rgba(0,0,0,0.25)); animation: latidoSuave 3s ease-in-out infinite; margin: 15px 0; border: 4px solid white; }
+        @keyframes latidoSuave { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-8px) scale(1.02); } }
+
+        /* --- MARCO CIRCULAR TRADICIONAL (Jefe 3) --- */
+        .img-circular { 
+            width: 140px; 
+            height: 140px; 
+            object-fit: cover; 
+            border-radius: 50%; 
+            border: 6px solid #38bdf8; 
+            margin-bottom: 15px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
+            background: white;
+        }
+
+        /* --- MARCO ROMO CUADRADO --- */
+        .img-marco-romo { 
+            width: 150px; 
+            height: 150px; 
+            object-fit: contain; 
+            border-radius: 30px; 
+            border: 5px solid #38bdf8; 
+            background: white; 
+            padding: 3px; 
+            margin-bottom: 15px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15); 
+            animation: latidoSuave 3s ease-in-out infinite; 
+        }
+
+        /* --- MARCO RECTANGULAR SIN FONDO (Para Jefe 6) --- */
+        .img-marco-rectangular {
+            width: 220px; 
+            height: auto; 
+            object-fit: contain; 
+            border-radius: 12px; 
+            border: 5px solid #38bdf8; 
+            background: transparent; /* Fondo transparente */
+            padding: 5px; 
+            margin-bottom: 15px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15); 
+            animation: latidoSuave 3s ease-in-out infinite; 
+        }
+
+        /* --- GIF GRANDE SIN MARCO (Para Jefe 5) --- */
+        .img-gif-grande {
+            width: 250px; 
+            height: auto;
+            object-fit: contain;
+            border: none; 
+            background: transparent; 
+            margin-bottom: 15px;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2)); 
+            animation: latidoSuave 3s ease-in-out infinite;
+        }
+
+        /* --- CAJA DETALLES --- */
+        .caja-detalles { width: 100%; background: rgba(240, 249, 255, 0.95); border: 2px dashed #7dd3fc; border-radius: 15px; padding: 20px; margin: 15px 0; text-align: left; }
+        .caja-detalles p { font-size: 1.15em; color: #0c4a6e; margin: 12px 0; display: flex; align-items: center; font-weight: 700; }
+        .icon { font-size: 1.5em; margin-right: 15px; background: white; border-radius: 50%; padding: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: #0284c7; }
+
+        /* --- FORMULARIO RSVP --- */
+        input[type="text"], input[type="number"] { width: 100%; padding: 18px; border: 3px solid #bae6fd; border-radius: 12px; font-size: 1.2em; text-align: center; margin-bottom: 20px; font-family: 'Fredoka', sans-serif; font-weight: 700; color: #0369a1; outline: none; transition: 0.3s; background: white; }
+        input[type="text"]:focus, input[type="number"]:focus { border-color: #0284c7; box-shadow: 0 0 15px rgba(2, 132, 199, 0.2); }
+        
+        .btn-wssp { display: block; width: 100%; background: linear-gradient(135deg, #25D366, #128C7E); color: white; text-decoration: none; padding: 18px; border-radius: 12px; font-size: 1.3em; font-weight: 700; box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3); text-transform: uppercase; transition: transform 0.3s, box-shadow 0.3s; }
+        .btn-wssp:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(37, 211, 102, 0.5); }
+
+    </style>
+</head>
+<body>
+
+    <!-- AUDIO -->
+    <audio id="musicaAudio" preload="auto">
+        <source src="cuna.mp3.mp3" type="audio/mpeg">
+        <source src="cuna.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- PANTALLA INICIAL (TELÓN) -->
+    <div id="pantalla-inicio" onclick="iniciarPelicula()">
+        <img src="jefe8.jpg" alt="Abrir Invitación" class="img-marco-romo" style="width: 160px; height: 160px;" onerror="this.onerror=null; this.src='jefe8.png';">
+        <div class="sobre-icono">💌✨</div>
+        <h1>Tocar para abrir<br>la invitación</h1>
+    </div>
+
+    <!-- CONTENEDOR DE LA PELÍCULA -->
+    <div id="contenedor-pelicula">
+
+        <!-- TOMA 1: INTRO DIVERTIDA -->
+        <div class="escena" id="escena-1">
+            <p class="texto-tierno">Dicen que los bebés traen amor, ternura y alegría...</p>
+            <p class="texto-pequeno">¡Pero el nuestro viene a dar las órdenes en casa!</p>
+        </div>
+
+        <!-- TOMA 2: LOS PAPÁS -->
+        <div class="escena" id="escena-2">
+            <p class="texto-pequeno">Con el corazón lleno de emoción:</p>
+            <h1 class="nombres-padres">Mayra y Gerardo</h1>
+            <p class="texto-tierno">tienen una hermosa noticia que compartir.</p>
+        </div>
+
+        <!-- TOMA 3: EL ANUNCIO (JEFE 1 ahora GIF) -->
+        <div class="escena" id="escena-3">
+            <span class="texto-destaque">¡ESTÁ EN CAMINO! 🍼</span>
+            <p class="texto-tierno">Nuestro nuevo jefe.</p>
+            <img src="jefe.gif" alt="Jefe" class="img-animada" onerror="this.onerror=null; this.src='jefe.png';">
+        </div>
+
+        <!-- TOMA 4: EL NOMBRE Y CONFETI -->
+        <div class="escena" id="escena-4">
+            <p class="texto-pequeno">Estamos muy felices de presentarles a:</p>
+            <h1 class="nombre-bebe">Mateo Gabriel</h1>
+            <img src="jefe4.jpg" alt="Jefe 4" class="img-animada" onerror="this.onerror=null; this.src='jefe4.png';">
+        </div>
+
+        <!-- TOMA 5: LAS EXIGENCIAS TIERNAS (JEFE 6 con Marco Rectangular Transparente) -->
+        <div class="escena" id="escena-5">
+            <img src="jefe6.jpg" alt="Jefe 6" class="img-marco-rectangular" onerror="this.onerror=null; this.src='jefe6.png';">
+            <p class="texto-tierno">El rey de la casa exige: mucho amor, muchos abrazos y ❤️🎁 ...</p>
+            <p class="texto-pequeno">¡Sobre todo que no faltes a su primera gran fiesta!</p>
+        </div>
+
+        <!-- TOMA 6: LA INVITACIÓN -->
+        <div class="escena" id="escena-6">
+            <img src="jefe7.jpg" alt="Jefe 7" class="img-marco-romo" onerror="this.onerror=null; this.src='jefe7.png';">
+            <p class="texto-tierno">Queremos celebrar contigo este momento tan especial en nuestro Baby Shower.</p>
+        </div>
+
+        <!-- TOMA 7: LOS DETALLES -->
+        <div class="escena" id="escena-7">
+            <img src="jefe3.jpg" alt="Jefe 3" class="img-circular" style="width: 100px; height: 100px; margin-bottom: 10px; border-width: 4px;" onerror="this.onerror=null; this.src='jefe3.png';">
+            <p class="texto-tierno" style="font-size: 1.25em;">Anota esta junta en tu agenda:</p>
+            <div class="caja-detalles">
+                <p><span class="icon">📅</span> Domingo 2 de Agosto</p>
+                <p><span class="icon">⏰</span> INICIO : 4:00 PM (Hora exacta)</p>
+                <p><span class="icon">⏰</span> TERMINO: 7:30 PM</p>
+                <p><span class="icon">📍</span> Av. Peravillo 2265 - Hualmay</p>
+                <p><span class="icon">🗺️</span> Referencia: Bodega Rosita</p>
+            </div>
+        </div>
+
+        <!-- TOMA 8: CONFIRMACIÓN FINAL -->
+        <div class="escena" id="escena-8">
+            <img src="jefe5.gif" alt="Jefe 5" class="img-gif-grande" onerror="this.onerror=null; this.src='jefe5.png';">
+            <p class="texto-tierno" style="font-size: 1.2em; margin-bottom: 20px;">¡Tu presencia será el mejor regalo!<br>Por favor, confirma tu asistencia.</p>
+            
+            <input type="text" id="nombreInvitado" placeholder="Tu Nombre y Apellido" required autocomplete="off">
+            <input type="number" id="numeroInvitados" placeholder="¿Cuántos asistirán en total?" required min="1" autocomplete="off">
+            
+            <a href="#" id="enlaceWssp" class="btn-wssp">CONFIRMAR ASISTENCIA 💙</a>
+        </div>
+
+    </div>
+
+    <script>
+        // --- LLUVIA DINÁMICA DE NEGOCIOS Y BEBÉ ---
+        function crearLluviaTematica() {
+            const body = document.querySelector('body');
+            const elemento = document.createElement('div');
+            elemento.classList.add('elemento-lluvia');
+            
+            const iconos = ['💵', '💰', '🍼', '🍪', '💼'];
+            elemento.innerText = iconos[Math.floor(Math.random() * iconos.length)];
+            
+            let size = Math.random() * 2 + 1.5; 
+            elemento.style.fontSize = size + 'em';
+            elemento.style.left = Math.random() * 100 + 'vw';
+            
+            let duracion = Math.random() * 5 + 5; 
+            elemento.style.animationDuration = duracion + 's'; 
+            
+            body.appendChild(elemento);
+            setTimeout(() => { elemento.remove(); }, duracion * 1000);
+        }
+        setInterval(crearLluviaTematica, 500); 
+
+        // --- MOTOR DE LA PELÍCULA (Tiempos extendidos +0.5s por fase) ---
+        function iniciarPelicula() {
+            const pantallaInicio = document.getElementById('pantalla-inicio');
+            pantallaInicio.style.opacity = '0';
+            setTimeout(() => { pantallaInicio.style.display = 'none'; }, 1000);
+
+            const audio = document.getElementById('musicaAudio');
+            audio.currentTime = 0;
+            audio.volume = 0.5;
+            audio.play().catch(e => console.log("Audio no disponible", e));
+
+            // TIMELINE CINEMATOGRÁFICO LENTO (+0.5 seg acumulado)
+            
+            // Toma 1
+            setTimeout(() => { mostrarEscena('escena-1'); }, 800); 
+
+            // Toma 2
+            setTimeout(() => { ocultarEscena('escena-1'); mostrarEscena('escena-2'); }, 6500); 
+
+            // Toma 3
+            setTimeout(() => { ocultarEscena('escena-2'); mostrarEscena('escena-3'); }, 13500); 
+
+            // Toma 4 + Confeti
+            setTimeout(() => { 
+                ocultarEscena('escena-3'); mostrarEscena('escena-4'); 
+                lanzarConfeti(2500); 
+            }, 20500); 
+
+            // Toma 5
+            setTimeout(() => { ocultarEscena('escena-4'); mostrarEscena('escena-5'); }, 27000); 
+
+            // Toma 6
+            setTimeout(() => { ocultarEscena('escena-5'); mostrarEscena('escena-6'); }, 33500); 
+
+            // Toma 7
+            setTimeout(() => { ocultarEscena('escena-6'); mostrarEscena('escena-7'); }, 39500); 
+
+            // Toma 8 + Súper Confeti
+            setTimeout(() => { 
+                ocultarEscena('escena-7'); mostrarEscena('escena-8'); 
+                lanzarConfeti(4000); 
+            }, 46500); 
+        }
+
+        // --- CONTROL DE ESCENAS ---
+        function mostrarEscena(id) {
+            document.getElementById(id).classList.add('visible');
+            document.getElementById(id).classList.remove('pasada');
+        }
+
+        function ocultarEscena(id) {
+            document.getElementById(id).classList.remove('visible');
+            document.getElementById(id).classList.add('pasada');
+        }
+
+        // --- EFECTO CONFETI ---
+        function lanzarConfeti(duracion) {
+            var end = Date.now() + duracion;
+            (function frame() {
+                confetti({ particleCount: 6, angle: 60, spread: 75, origin: { x: 0 }, colors: ['#38bdf8', '#0284c7', '#ffffff', '#fcd34d'] });
+                confetti({ particleCount: 6, angle: 120, spread: 75, origin: { x: 1 }, colors: ['#38bdf8', '#0284c7', '#ffffff', '#fcd34d'] });
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+        }
+
+        // --- LÓGICA WHATSAPP PERSONALIZADA ---
+        const inputNombre = document.getElementById('nombreInvitado');
+        const inputInvitados = document.getElementById('numeroInvitados');
+        const enlaceWssp = document.getElementById('enlaceWssp');
+        const miNumero = "51961242768"; 
+
+        enlaceWssp.addEventListener('click', function(e) {
+            if (inputNombre.value.trim() === "" || inputInvitados.value.trim() === "") {
+                e.preventDefault();
+                alert("🍼 ¡Por favor escribe tu nombre y cuántos asistirán para esperarte!");
+                if(inputNombre.value.trim() === "") inputNombre.focus();
+                else inputInvitados.focus();
+            }
+        });
+
+        function actualizarEnlace() {
+            const nom = inputNombre.value.trim();
+            const cant = inputInvitados.value.trim();
+            if (nom !== "" && cant !== "") {
+                const msj = `¡Hola Mayra y Gerardo! Confirmo mi asistencia al Baby Shower de Mateo Gabriel. Soy ${nom} y asistiremos ${cant} persona(s) en total. ¡Ahí nos vemos con mucha alegría! 🍼💙`;
+                enlaceWssp.href = `https://api.whatsapp.com/send?phone=${miNumero}&text=${encodeURIComponent(msj)}`;
+                enlaceWssp.target = "_blank";
+            } else {
+                enlaceWssp.href = "#";
+                enlaceWssp.removeAttribute("target");
+            }
+        }
+
+        inputNombre.addEventListener('input', actualizarEnlace);
+        inputInvitados.addEventListener('input', actualizarEnlace);
+    </script>
+</body>
+</html>
